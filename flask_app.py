@@ -5,8 +5,10 @@ import pandas as pd
 import numpy as np
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
+from happytransformer import HappyTextToText
 
-UPLOAD_FOLDER = "./uploads"
+happy_tt = HappyTextToText("T5", "vennify/t5-base-grammar-correction")
+UPLOAD_FOLDER = "C:\\Users\\rietesh.amminabhavi\\Desktop\code\\nextlabs\\uploads"
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
@@ -54,7 +56,7 @@ def upload_file():
             answer = get_results(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             print(type(answer))
             return render_template("table.html", tables=[answer.reset_index().to_html()], titles=[''])
-            
+
     return '''
     <!doctype html>
     <title>Sentiment Mismatch</title>
@@ -65,6 +67,20 @@ def upload_file():
       <input type=submit value=Upload>
     </form>
     '''
+
+def get_correct_sent(text):
+    text = "grammar: "+text
+    result = happy_tt.generate_text(text)
+    return result.text
+
+
+@app.route('/grammar_check/', methods=['GET', 'POST'])
+def check_grammar():
+    if request.method == 'POST':
+        res = get_correct_sent(request.form.text)
+    if request.method == 'GET':
+        df = pd.read_csv('./grammar_results.csv')
+        return render_template("table.html", tables=[df.to_html()], titles=[''])
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 80)))
