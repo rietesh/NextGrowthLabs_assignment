@@ -6,7 +6,7 @@ import numpy as np
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
 
-UPLOAD_FOLDER = "C:\\Users\\rietesh.amminabhavi\\Desktop\code\\nextlabs\\uploads"
+UPLOAD_FOLDER = "./uploads"
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
