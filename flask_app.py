@@ -56,7 +56,7 @@ def upload_file():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             answer = get_results(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return render_template("table.html", tables=[answer.reset_index().to_html()], titles=[''])
+            return render_template("table2.html", tables=[answer.reset_index().to_html()], titles=[''])
 
     return '''
     <!doctype html>
