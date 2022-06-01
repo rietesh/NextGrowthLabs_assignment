@@ -8,8 +8,10 @@ from textblob import TextBlob
 from happytransformer import HappyTextToText
 
 happy_tt = HappyTextToText("T5", "vennify/t5-base-grammar-correction")
-UPLOAD_FOLDER = "C:\\Users\\rietesh.amminabhavi\\Desktop\code\\nextlabs\\uploads"
+UPLOAD_FOLDER = "./uploads"
 ALLOWED_EXTENSIONS = {'csv'}
+df = pd.read_csv('./grammar_results.csv')
+df = df[df['is_Error']==1]
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -54,7 +56,6 @@ def upload_file():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             answer = get_results(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            print(type(answer))
             return render_template("table.html", tables=[answer.reset_index().to_html()], titles=[''])
 
     return '''
@@ -77,9 +78,11 @@ def get_correct_sent(text):
 @app.route('/grammar_check/', methods=['GET', 'POST'])
 def check_grammar():
     if request.method == 'POST':
-        res = get_correct_sent(request.form.text)
+        res = get_correct_sent(request.form['fname'])
+        d = pd.DataFrame({'input': [request.form['fname']], 'Grammar Corrected': [res]})
+        return render_template("table.html", tables=[d.to_html()], titles=[''])
+
     if request.method == 'GET':
-        df = pd.read_csv('./grammar_results.csv')
         return render_template("table.html", tables=[df.to_html()], titles=[''])
 
 if __name__ == "__main__":
